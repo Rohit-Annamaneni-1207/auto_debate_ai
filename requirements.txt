@@ -1,0 +1,3 @@
+faiss_cpu==1.12.0
+numpy==1.24.4
+sentence_transformers==5.1.2
