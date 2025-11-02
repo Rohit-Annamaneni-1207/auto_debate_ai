@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+
+venv/
+.venv/
+env/
+.env/
+
+.env
+.env.*
+!.env.example
+
+build/
+dist/
+*.egg-info/
+*.whl
+
+*.log
+
+
+#To avoid conflicts!!!
+metadata.json
+*.faiss
