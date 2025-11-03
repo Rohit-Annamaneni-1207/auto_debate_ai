@@ -1,0 +1,36 @@
+SVD and diagonalizability - Done
+SVM - conditions for kernel functions - Done
++ve or -ve definite or semi definite - Done
+convex and concave functions - Done
+pivots (system of equations) - Done
+DSA - cross edges
+matrix - quadratic form - Done
+matrix - partition matrix - Done
+DBMS - lossy, lossless, dependency preserving joins
+DSA - asymptotic relations and masters method
+
+REVISE DSA
+
+LAPSES 2
+
+Basic limits, integrals, derivatives - Byheart
+Masters method - Byheart
+File indexing
+What is gain ratio pertaining to information gain?
+Topdown clustering algos like DIANA
+Direction vector in LDA
+Weight updation rule in Ridge regression
+Python awareness on global and local assignments - play around on vs code
+Matrix diagonalizability
+Projection matrix
+
+
+
+BRUSH UP ON LINALG
+
+
+
+LAPSES 3
+LINALG - transformation and change of basis
+
+**Meditate for awareness and reducing silly mistakes**
