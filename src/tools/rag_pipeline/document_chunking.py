@@ -34,5 +34,5 @@ def load_chunk_document(file_path:str):
         raise ValueError("Unsupported file format. Please provide a PDF or TXT file.")
     return chunks
 
-print(load_chunk_document("data/knowledge_base_1/documents/Leveraging_Content_and_Acoustic_Representations_for_Speech_Emotion_Recognition.pdf"))
-print(load_chunk_document("data/knowledge_base_1/documents/LAPSES.txt"))
+# print(load_chunk_document("data/knowledge_base_1/documents/Leveraging_Content_and_Acoustic_Representations_for_Speech_Emotion_Recognition.pdf"))
+# print(load_chunk_document("data/knowledge_base_1/documents/LAPSES.txt"))
