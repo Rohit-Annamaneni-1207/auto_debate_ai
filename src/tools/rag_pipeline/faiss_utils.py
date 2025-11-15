@@ -19,7 +19,9 @@ def load_index(path: str = INDEX_PATH):
     else:
         raise FileNotFoundError(f"No index found at {idx_path}")
 
-def create_load_index(embedding_model: SentenceTransformer ,idx_path: str = INDEX_PATH):
+def create_load_index(embedding_model: SentenceTransformer , idx_num: int = 1):
+
+    idx_path = INDEX_PATH + f"_{idx_num}"
     idx_embed_path = os.path.join(idx_path, EMBEDDING_SUBPATH)
     if os.path.exists(idx_embed_path):
         print(f"Index already exists at {idx_embed_path}")
@@ -38,7 +40,8 @@ def create_load_index(embedding_model: SentenceTransformer ,idx_path: str = INDE
             f.flush()
         return index, metadata
     
-def add_embeddings(texts:list, embedding_model:SentenceTransformer, index: faiss.IndexFlatIP, path: str = INDEX_PATH):
+def add_embeddings(texts:list, embedding_model:SentenceTransformer, index: faiss.IndexFlatIP,  idx_num: int = 1):
+    path = INDEX_PATH + f"_{idx_num}"
     idx_path = os.path.join(path, EMBEDDING_SUBPATH)
     old_count = index.ntotal
     embeddings = embedding_model.encode(texts)
@@ -61,7 +64,9 @@ def add_embeddings(texts:list, embedding_model:SentenceTransformer, index: faiss
 
     return index, metadata
 
-def search_index(query: str, embedding_model: SentenceTransformer, index: faiss.IndexFlatIP, top_k: int = 5, idx_path: str = INDEX_PATH):
+def search_index(query: str, embedding_model: SentenceTransformer, index: faiss.IndexFlatIP, top_k: int = 5, idx_num: int = 1):
+
+    idx_path = INDEX_PATH + f"_{idx_num}"
     query_embedding = embedding_model.encode([query])
     D, I = index.search(np.array(query_embedding).astype("float32"), top_k)
 
@@ -75,6 +80,7 @@ def search_index(query: str, embedding_model: SentenceTransformer, index: faiss.
     # results = [{"text": metadata[i]["text"], "score": float(D[0][j])} for j, i in enumerate(I[0])]
     return results
     
+
 def clear_index(path: str = INDEX_PATH):
     idx_path = os.path.join(path, EMBEDDING_SUBPATH)
     metadata_path = os.path.join(path, METADATA_SUBPATH)
@@ -88,4 +94,23 @@ def clear_index(path: str = INDEX_PATH):
         print(f"No index found at {path} to delete.")
 
 
+# embedding_mosdel = SentenceTransformer('all-MiniLM-L6-v2')
 
+# Testing the functions
+if __name__ == "__main__":
+    from sentence_transformers import SentenceTransformer
+
+    embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+    index, metadata = create_load_index(embedding_model, idx_num=1)
+    texts = [
+        "The cat sits on the mat.",
+        "Dogs are great pets.",
+        "Artificial Intelligence is the future.",
+        "Python is a popular programming language.",
+        "The sun rises in the east."
+    ]
+    index, metadata = add_embeddings(texts, embedding_model, index, idx_num=1)
+    query = "What is AI?"
+    results = search_index(query, embedding_model, index, top_k=3, idx_num=1)
+    for res in results:
+        print(f"Text: {res['text']}, Score: {res['score']}")
