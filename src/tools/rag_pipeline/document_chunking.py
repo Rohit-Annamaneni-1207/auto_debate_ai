@@ -36,3 +36,9 @@ def load_chunk_document(file_path:str):
 
 # print(load_chunk_document("data/knowledge_base_1/documents/Leveraging_Content_and_Acoustic_Representations_for_Speech_Emotion_Recognition.pdf"))
 # print(load_chunk_document("data/knowledge_base_1/documents/LAPSES.txt"))
+
+if __name__ == "__main__":
+    pdf_chunks = load_chunk_document("data/knowledge_base_1/documents/Leveraging_Content_and_Acoustic_Representations_for_Speech_Emotion_Recognition.pdf")
+    print(f"PDF Chunks: {len(pdf_chunks)}")
+    txt_chunks = load_chunk_document("data/knowledge_base_1/documents/LAPSES.txt")
+    print(f"TXT Chunks: {len(txt_chunks)}")
