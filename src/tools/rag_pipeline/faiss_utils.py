@@ -8,7 +8,8 @@ INDEX_PATH = os.path.abspath(os.path.join("data", "knowledge_base"))
 EMBEDDING_SUBPATH = os.path.join("embeddings", "index.faiss")
 METADATA_SUBPATH = os.path.join("metadata", "metadata.json")
 
-def load_index(path: str = INDEX_PATH):
+def load_index(idx_num: int = 1):
+    path = INDEX_PATH + f"_{idx_num}"
     idx_path = os.path.join(path, EMBEDDING_SUBPATH)
     if os.path.exists(idx_path):
         index = faiss.read_index(idx_path)
@@ -25,7 +26,7 @@ def create_load_index(embedding_model: SentenceTransformer , idx_num: int = 1):
     idx_embed_path = os.path.join(idx_path, EMBEDDING_SUBPATH)
     if os.path.exists(idx_embed_path):
         print(f"Index already exists at {idx_embed_path}")
-        return load_index()
+        return load_index(idx_num=idx_num)
 
     else:
         embedding_dim = np.array(embedding_model.encode(["Hello world"]))
@@ -81,7 +82,8 @@ def search_index(query: str, embedding_model: SentenceTransformer, index: faiss.
     return results
     
 
-def clear_index(path: str = INDEX_PATH):
+def clear_index(idx_num: int = 1):
+    path = INDEX_PATH + f"_{idx_num}"
     idx_path = os.path.join(path, EMBEDDING_SUBPATH)
     metadata_path = os.path.join(path, METADATA_SUBPATH)
     if os.path.exists(metadata_path):
@@ -114,3 +116,5 @@ if __name__ == "__main__":
     results = search_index(query, embedding_model, index, top_k=3, idx_num=1)
     for res in results:
         print(f"Text: {res['text']}, Score: {res['score']}")
+
+    clear_index(idx_num=1)
