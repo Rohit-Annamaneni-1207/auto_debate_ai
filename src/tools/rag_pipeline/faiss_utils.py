@@ -41,9 +41,10 @@ def create_load_index(embedding_model: SentenceTransformer , idx_num: int = 1):
             f.flush()
         return index, metadata
     
-def add_embeddings(texts:list, embedding_model:SentenceTransformer, index: faiss.IndexFlatIP,  idx_num: int = 1):
+def add_embeddings(texts:list, embedding_model:SentenceTransformer, idx_num: int = 1):
     path = INDEX_PATH + f"_{idx_num}"
     idx_path = os.path.join(path, EMBEDDING_SUBPATH)
+    index, metadata = load_index(idx_num=idx_num)
     old_count = index.ntotal
     embeddings = embedding_model.encode(texts)
     index.add(np.array(embeddings).astype("float32"))
@@ -52,8 +53,8 @@ def add_embeddings(texts:list, embedding_model:SentenceTransformer, index: faiss
     print(f"Added {new_count - old_count} embeddings to the index.")
 
     metadata_path = os.path.join(path, METADATA_SUBPATH)
-    with open(metadata_path, 'r') as f:
-        metadata = json.load(f)
+    # with open(metadata_path, 'r') as f:
+    #     metadata = json.load(f)
 
     embeddings_list = embeddings.tolist()
     for i in range(len(texts)):
@@ -65,14 +66,15 @@ def add_embeddings(texts:list, embedding_model:SentenceTransformer, index: faiss
 
     return index, metadata
 
-def search_index(query: str, embedding_model: SentenceTransformer, index: faiss.IndexFlatIP, top_k: int = 5, idx_num: int = 1):
+def search_index(query: str, embedding_model: SentenceTransformer, top_k: int = 5, idx_num: int = 1):
 
     idx_path = INDEX_PATH + f"_{idx_num}"
+    index, metadata = load_index(idx_num=idx_num)
     query_embedding = embedding_model.encode([query])
     D, I = index.search(np.array(query_embedding).astype("float32"), top_k)
 
-    with open(os.path.join(idx_path, METADATA_SUBPATH), 'r') as f:
-        metadata = json.load(f)
+    # with open(os.path.join(idx_path, METADATA_SUBPATH), 'r') as f:
+    #     metadata = json.load(f)
 
     print(f"Search results indices: {I}, distances: {D}")
     results = []
