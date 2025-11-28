@@ -21,14 +21,14 @@ def in_detail_search(url: str):
 
 if __name__ == "__main__":
     # Example usage
-    search_results = web_search("Artificial Intelligence", num_results=3)
+    search_results = web_search("Artificial Intelligence", num_results=1)
     for i, result in enumerate(search_results):
         print(f"Result {i+1}:")
         print(f"Title: {result['title']}")
         print(f"URL: {result['url']}")
 
     if search_results:
-        first_url = search_results[1]['url']
+        first_url = search_results[0]['url']
         detailed_content = in_detail_search(first_url)
         print(f"Detailed content from {first_url}:\n{detailed_content}")  # Print first 500 characters
 
