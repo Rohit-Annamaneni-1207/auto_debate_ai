@@ -1,5 +1,5 @@
-from document_chunking import load_chunk_document
-from faiss_utils import create_load_index, add_embeddings, clear_index, search_index
+from src.tools.rag_pipeline.document_chunking import load_chunk_document
+from src.tools.rag_pipeline.faiss_utils import create_load_index, add_embeddings, clear_index, search_index
 from sentence_transformers import SentenceTransformer
 import os
 import numpy as np

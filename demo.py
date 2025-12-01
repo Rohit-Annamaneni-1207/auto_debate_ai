@@ -1,12 +1,21 @@
 import os
 from dotenv import load_dotenv
 from src.agents.orchestrator_agent import OrchestratorAgent
+from src.tools.rag_pipeline.faiss_utils import clear_index, search_index
+from src.tools.rag_pipeline.process_file import process_file_add_to_index
+from sentence_transformers import SentenceTransformer
+
+EMBEDDING_MODEL = SentenceTransformer('all-MiniLM-L6-v2')
 
 # Load environment variables
 load_dotenv()
 
 def main():
     # Check for API key
+    clear_index(idx_num=1)
+    clear_index(idx_num=2)
+    process_file_add_to_index(embedding_model=EMBEDDING_MODEL, idx_num=1)
+    process_file_add_to_index(embedding_model=EMBEDDING_MODEL, idx_num=2)
     if not os.getenv("OPENAI_API_KEY"):
         print("Error: OPENAI_API_KEY not found in environment variables.")
         # For demo purposes, we might need to mock or ask user, but let's assume it's there or fail gracefully
@@ -14,7 +23,19 @@ def main():
 
     orchestrator = OrchestratorAgent()
     
-    problem = "Find the number of rectangles that can be formed inside a fixed regular dodecagon (12-gon) where each side of the rectangle lies on either a side or a diagonal of the dodecagon."
+    # problem = "Find the number of rectangles that can be formed inside a fixed regular dodecagon (12-gon) where each side of the rectangle lies on either a side or a diagonal of the dodecagon."
+
+    problem = "What is an acoustic representation?"
+
+    search_results = search_index(problem, EMBEDDING_MODEL, top_k=5, idx_num=1)
+    search_results.extend(search_index(problem, EMBEDDING_MODEL, top_k=5, idx_num=2))
+
+    search_results = sorted(search_results, key=lambda x: x['score'], reverse=True)
+
+    num_retrieved = 5
+    retrieved_text = "\n".join([result['text'] for result in search_results[:num_retrieved]])
+    problem = problem + "\n\nRetrieved Text for context: " + retrieved_text
+
     print(f"Problem: {problem}\n")
     
     print("Running Orchestrator...")
