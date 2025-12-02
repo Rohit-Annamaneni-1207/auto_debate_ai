@@ -348,36 +348,118 @@ with tabs[1]:
 
                     # Display results if available
                     if result:
-                        st.subheader("Final synthesized answer")
-                        final_ans = result.get("final_answer") or result.get("final", result.get("output", ""))
-                        st.write(final_ans)
-
-                        st.markdown("---")
-                        st.subheader("Worker-level details (debug)")
-
-                        # Worker responses and critiques are expected keys (based on earlier project design)
-                        w1_resp = result.get("worker1_response")
-                        w2_resp = result.get("worker2_response")
-                        w1_crit = result.get("worker1_critique")
-                        w2_crit = result.get("worker2_critique")
+                        # Get history if available
+                        w1_history = result.get("worker1_history", [])
+                        w2_history = result.get("worker2_history", [])
                         iteration = result.get("iteration", None)
+                        
+                        # Display workflow history
+                        st.markdown("---")
+                        st.subheader("🔄 Orchestrator Workflow - Complete History")
+                        
+                        if w1_history or w2_history:
+                            # Group by iteration
+                            max_iter = max(
+                                [entry.get("iteration", 0) for entry in w1_history] + 
+                                [entry.get("iteration", 0) for entry in w2_history]
+                            )
+                            
+                            for iter_num in range(max_iter + 1):
+                                st.markdown(f"### Iteration {iter_num}")
+                                
+                                # Worker 1 and Worker 2 solve (only in iteration 0)
+                                if iter_num == 0:
+                                    col1, col2 = st.columns(2)
+                                    
+                                    with col1:
+                                        w1_solve = [e for e in w1_history if e.get("type") == "solve" and e.get("iteration") == iter_num]
+                                        if w1_solve:
+                                            st.markdown("**💡 Worker 1 - Initial Solution**")
+                                            with st.expander("View Worker 1's solution", expanded=True):
+                                                st.write(w1_solve[0]["content"])
+                                    
+                                    with col2:
+                                        w2_solve = [e for e in w2_history if e.get("type") == "solve" and e.get("iteration") == iter_num]
+                                        if w2_solve:
+                                            st.markdown("**💡 Worker 2 - Initial Solution**")
+                                            with st.expander("View Worker 2's solution", expanded=True):
+                                                st.write(w2_solve[0]["content"])
+                                
+                                # Critiques
+                                col1, col2 = st.columns(2)
+                                
+                                with col1:
+                                    w1_critique = [e for e in w1_history if e.get("type") == "critique" and e.get("iteration") == iter_num]
+                                    if w1_critique:
+                                        st.markdown(f"**🔍 Worker 1 critiques Worker 2**")
+                                        with st.expander("View Worker 1's critique", expanded=False):
+                                            st.write(w1_critique[0]["content"])
+                                
+                                with col2:
+                                    w2_critique = [e for e in w2_history if e.get("type") == "critique" and e.get("iteration") == iter_num]
+                                    if w2_critique:
+                                        st.markdown(f"**🔍 Worker 2 critiques Worker 1**")
+                                        with st.expander("View Worker 2's critique", expanded=False):
+                                            st.write(w2_critique[0]["content"])
+                                
+                                # Refinements (only if not the last iteration)
+                                if iter_num < max_iter:
+                                    st.markdown("**🔧 Refinements**")
+                                    col1, col2 = st.columns(2)
+                                    
+                                    with col1:
+                                        w1_refine = [e for e in w1_history if e.get("type") == "refine" and e.get("iteration") == iter_num + 1]
+                                        if w1_refine:
+                                            st.markdown("**Worker 1 - Refined Response**")
+                                            with st.expander("View Worker 1's refinement", expanded=False):
+                                                st.write(w1_refine[0]["content"])
+                                    
+                                    with col2:
+                                        w2_refine = [e for e in w2_history if e.get("type") == "refine" and e.get("iteration") == iter_num + 1]
+                                        if w2_refine:
+                                            st.markdown("**Worker 2 - Refined Response**")
+                                            with st.expander("View Worker 2's refinement", expanded=False):
+                                                st.write(w2_refine[0]["content"])
+                                
+                                if iter_num < max_iter:
+                                    st.markdown("---")
+                        
+                        else:
+                            # Fallback to old display if history not available
+                            w1_resp = result.get("worker1_response")
+                            w2_resp = result.get("worker2_response")
+                            w1_crit = result.get("worker1_critique")
+                            w2_crit = result.get("worker2_critique")
 
-                        if w1_resp:
-                            st.markdown("**Worker 1 final response:**")
-                            st.write(w1_resp)
-                        if w1_crit:
-                            st.markdown("**Worker 1 critique of Worker 2:**")
-                            st.write(w1_crit)
+                            if w1_resp:
+                                st.markdown("**Worker 1 final response:**")
+                                st.write(w1_resp)
 
-                        if w2_resp:
-                            st.markdown("**Worker 2 final response:**")
-                            st.write(w2_resp)
-                        if w2_crit:
-                            st.markdown("**Worker 2 critique of Worker 1:**")
-                            st.write(w2_crit)
+                            if w2_resp:
+                                st.markdown("**Worker 2 final response:**")
+                                st.write(w2_resp)
 
+                            if w1_crit:
+                                st.markdown("**Worker 1 critique of Worker 2:**")
+                                st.write(w1_crit)
+
+                            if w2_crit:
+                                st.markdown("**Worker 2 critique of Worker 1:**")
+                                st.write(w2_crit)
+                        
+                        # Display final synthesized answer at the end
+                        st.markdown("---")
+                        st.subheader("✅ Final Synthesized Answer")
+                        final_ans = result.get("final_answer") or result.get("final", result.get("output", ""))
+                        
+                        if final_ans:
+                            st.success("The orchestrator has synthesized the following final answer:")
+                            st.write(final_ans)
+                        else:
+                            st.warning("No final answer available")
+                        
                         if iteration is not None:
-                            st.caption(f"Orchestrator completed with iteration count: {iteration}")
+                            st.caption(f"✓ Orchestrator completed with {iteration} iteration(s)")
 
 # ------ Tab: Debate ------
 with tabs[2]:

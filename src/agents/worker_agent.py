@@ -9,6 +9,7 @@ class WorkerState(TypedDict):
     task: str # "solve", "critique", or "refine"
     original_response: str # For critique/refine task
     critique: str # For refine task
+    response_history: List[str] # All responses from all rounds
 
 class WorkerAgent:
     def __init__(self, model_name: str = "meta-llama/Meta-Llama-3.1-8B-Instruct", name: str = "Worker"):
@@ -29,11 +30,14 @@ class WorkerAgent:
     def process_task(self, state: WorkerState):
         task = state.get("task")
         messages = state.get("messages", [])
+        response_history = state.get("response_history", [])
         
         if task == "solve":
             # Just respond to the last message which should be the problem
             response = self.llm.invoke(messages)
-            return {"messages": [response]}
+            response_content = response.content
+            response_history.append(response_content)
+            return {"messages": [response], "response_history": response_history}
         
         elif task == "critique":
             original_response = state.get("original_response")
@@ -50,7 +54,9 @@ class WorkerAgent:
             # We preserve history but add the critique request
             messages_with_prompt = messages + [HumanMessage(content=critique_prompt)]
             response = self.llm.invoke(messages_with_prompt)
-            return {"messages": [response]}
+            response_content = response.content
+            response_history.append(response_content)
+            return {"messages": [response], "response_history": response_history}
 
         elif task == "refine":
             original_response = state.get("original_response")
@@ -59,9 +65,11 @@ class WorkerAgent:
             
             messages_with_prompt = messages + [HumanMessage(content=refine_prompt)]
             response = self.llm.invoke(messages_with_prompt)
-            return {"messages": [response]}
+            response_content = response.content
+            response_history.append(response_content)
+            return {"messages": [response], "response_history": response_history}
         
-        return {"messages": [AIMessage(content="Unknown task")]}
+        return {"messages": [AIMessage(content="Unknown task")], "response_history": response_history}
 
     def invoke(self, inputs):
         return self.graph.invoke(inputs)

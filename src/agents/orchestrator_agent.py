@@ -14,6 +14,8 @@ class OrchestratorState(TypedDict):
     final_answer: str
     messages: List[BaseMessage]
     iteration: int
+    worker1_history: List[Dict[str, str]]  # List of {"type": "solve/critique/refine", "content": str}
+    worker2_history: List[Dict[str, str]]  # List of {"type": "solve/critique/refine", "content": str}
 
 class OrchestratorAgent:
     def __init__(self):
@@ -65,9 +67,18 @@ class OrchestratorAgent:
         })
         w2_response = w2_result["messages"][-1].content
 
+        # Initialize history
+        w1_history = state.get("worker1_history", [])
+        w2_history = state.get("worker2_history", [])
+        
+        w1_history.append({"type": "solve", "iteration": 0, "content": w1_response})
+        w2_history.append({"type": "solve", "iteration": 0, "content": w2_response})
+
         return {
             "worker1_response": w1_response,
             "worker2_response": w2_response,
+            "worker1_history": w1_history,
+            "worker2_history": w2_history,
             "iteration": 0
         }
 
@@ -75,6 +86,7 @@ class OrchestratorAgent:
         w1_response = state["worker1_response"]
         w2_response = state["worker2_response"]
         problem = state["problem"]
+        iteration = state["iteration"]
 
         # Worker 1 critiques Worker 2's response
         w1_critique_result = self.worker1.invoke({
@@ -92,9 +104,18 @@ class OrchestratorAgent:
         })
         w2_critique = w2_critique_result["messages"][-1].content
 
+        # Track critiques in history
+        w1_history = state.get("worker1_history", [])
+        w2_history = state.get("worker2_history", [])
+        
+        w1_history.append({"type": "critique", "iteration": iteration, "content": w1_critique, "target": "Worker 2"})
+        w2_history.append({"type": "critique", "iteration": iteration, "content": w2_critique, "target": "Worker 1"})
+
         return {
             "worker1_critique": w1_critique,
-            "worker2_critique": w2_critique
+            "worker2_critique": w2_critique,
+            "worker1_history": w1_history,
+            "worker2_history": w2_history
         }
 
     def refine_response(self, state: OrchestratorState):
@@ -105,6 +126,7 @@ class OrchestratorAgent:
         w1_critique = state["worker1_critique"] # Critique OF Worker 2 (by Worker 1)
         
         problem = state["problem"]
+        iteration = state["iteration"]
 
         # Worker 1 refines
         w1_refine_result = self.worker1.invoke({
@@ -124,9 +146,18 @@ class OrchestratorAgent:
         })
         w2_new_response = w2_refine_result["messages"][-1].content
 
+        # Track refinements in history
+        w1_history = state.get("worker1_history", [])
+        w2_history = state.get("worker2_history", [])
+        
+        w1_history.append({"type": "refine", "iteration": iteration + 1, "content": w1_new_response})
+        w2_history.append({"type": "refine", "iteration": iteration + 1, "content": w2_new_response})
+
         return {
             "worker1_response": w1_new_response,
             "worker2_response": w2_new_response,
+            "worker1_history": w1_history,
+            "worker2_history": w2_history,
             "iteration": state["iteration"] + 1
         }
 

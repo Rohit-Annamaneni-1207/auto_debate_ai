@@ -27,14 +27,14 @@ def main():
 
     problem = "What is an acoustic representation?"
 
-    search_results = search_index(problem, EMBEDDING_MODEL, top_k=5, idx_num=1)
-    search_results.extend(search_index(problem, EMBEDDING_MODEL, top_k=5, idx_num=2))
+    # search_results = search_index(problem, EMBEDDING_MODEL, top_k=5, idx_num=1)
+    # search_results.extend(search_index(problem, EMBEDDING_MODEL, top_k=5, idx_num=2))
 
-    search_results = sorted(search_results, key=lambda x: x['score'], reverse=True)
+    # search_results = sorted(search_results, key=lambda x: x['score'], reverse=True)
 
-    num_retrieved = 5
-    retrieved_text = "\n".join([result['text'] for result in search_results[:num_retrieved]])
-    problem = problem + "\n\nRetrieved Text for context: " + retrieved_text
+    # num_retrieved = 5
+    # retrieved_text = "\n".join([result['text'] for result in search_results[:num_retrieved]])
+    # problem = problem + "\n\nRetrieved Text for context: " + retrieved_text
 
     print(f"Problem: {problem}\n")
     
