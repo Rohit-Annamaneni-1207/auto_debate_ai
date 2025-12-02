@@ -178,6 +178,33 @@ with tabs[0]:
             except Exception as e:
                 st.error(f"Failed to clear KB1: {e}")
 
+        # --- DELETE FILE FROM KB1 ---
+        st.markdown("### Delete a file from KB1")
+
+        kb1_files = list_documents(1)
+        if kb1_files:
+            kb1_to_delete = st.selectbox(
+                "Select a file to delete (KB1)",
+                options=["-- select --"] + kb1_files,
+                key="kb1_delete_select"
+            )
+
+            kb1_confirm = st.checkbox(
+                "I confirm I want to permanently delete this file from KB1",
+                key="kb1_delete_confirm"
+            )
+
+            if st.button("Delete Selected File from KB1", key="kb1_delete_button",
+                         disabled=(kb1_to_delete == "-- select --" or not kb1_confirm)):
+                try:
+                    file_path = KB1_DOCS / kb1_to_delete
+                    file_path.unlink()
+                    st.success(f"Deleted file permanently: {kb1_to_delete}")
+                except Exception as e:
+                    st.error(f"Failed to delete file: {e}")
+        else:
+            st.info("No files available in KB1 to delete.")
+
     with col2:
         st.subheader("Knowledge Base 2 (KB2)")
         st.write("Documents (KB2):")
@@ -207,6 +234,33 @@ with tabs[0]:
                 st.success("Cleared KB2 embeddings/index/metadata.")
             except Exception as e:
                 st.error(f"Failed to clear KB2: {e}")
+
+        # --- DELETE FILE FROM KB2 ---
+        st.markdown("### Delete a file from KB2")
+
+        kb2_files = list_documents(2)
+        if kb2_files:
+            kb2_to_delete = st.selectbox(
+                "Select a file to delete (KB2)",
+                options=["-- select --"] + kb2_files,
+                key="kb2_delete_select"
+            )
+
+            kb2_confirm = st.checkbox(
+                "I confirm I want to permanently delete this file from KB2",
+                key="kb2_delete_confirm"
+            )
+
+            if st.button("Delete Selected File from KB2", key="kb2_delete_button",
+                         disabled=(kb2_to_delete == "-- select --" or not kb2_confirm)):
+                try:
+                    file_path = KB2_DOCS / kb2_to_delete
+                    file_path.unlink()
+                    st.success(f"Deleted file permanently: {kb2_to_delete}")
+                except Exception as e:
+                    st.error(f"Failed to delete file: {e}")
+        else:
+            st.info("No files available in KB2 to delete.")
 
     st.markdown("---")
     st.markdown(
