@@ -164,17 +164,17 @@ class DebateModerator:
         workflow = StateGraph(DebateState)
         
         # Add nodes
-        workflow.add_node("initial_rag_search", self.initial_rag_search)
+        # workflow.add_node("initial_rag_search", self.initial_rag_search) #FIND BACK
         workflow.add_node("proponent_argues", self.proponent_argues)
         workflow.add_node("opponent_argues", self.opponent_argues)
         workflow.add_node("increment_round", self.increment_round)
         workflow.add_node("generate_summary", self.generate_summary)
         
         # Set entry point to initial RAG search
-        workflow.set_entry_point("initial_rag_search")
+        workflow.set_entry_point("proponent_argues")
         
         # Add edges
-        workflow.add_edge("initial_rag_search", "proponent_argues")
+        # workflow.add_edge("initial_rag_search", "proponent_argues")
         workflow.add_edge("proponent_argues", "opponent_argues")
         workflow.add_edge("opponent_argues", "increment_round")
         
