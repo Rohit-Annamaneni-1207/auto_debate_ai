@@ -38,16 +38,16 @@ auto_debate_ai/
 
 ### Agent Workflows
 #### Debate Workflow
-workflow flowchart
+workflow flowchart<br />
 ![Flowchart](/workflow_images/GenAI_Flowchart.drawio.png)
-workflow UML
+workflow UML<br />
 ![UML](/workflow_images/GenAI_Flowchart_2.drawio.png)
 #### Orchestrator Workflow
-Initial response
+Initial response<br />
 ![Initial response](/workflow_images/orchestrator_part_one.jpg)
-Peer critique
+Peer critique<br />
 ![Peer critique](/workflow_images/orchestrator_part_two.jpg)
-Refine response and loop decision
+Refine response and loop decision<br />
 ![Refine response](/workflow_images/orchestrator_part_three.jpg)
 
 ## Features
