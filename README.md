@@ -1,18 +1,17 @@
 # Auto Debate AI
 
-A sophisticated multi-agent AI system that facilitates intelligent debates and collaborative problem-solving using LangGraph, RAG (Retrieval-Augmented Generation), and Large Language Models.
+A  multi-llm system that facilitates intelligent debates and collaborative problem-solving using LangGraph, RAG, and LLMs.
 
-## 🌟 Overview
+## Overview
 
-Auto Debate AI is a multi-agent framework that implements two primary workflows:
+We built a multi-agent framework that implements two primary workflows:
 
-1. **Orchestrator System**: A collaborative problem-solving approach where multiple worker agents solve problems, critique each other's solutions, refine their responses, and synthesize a final answer.
+1. **Problem solving system**: A collaborative problem-solving approach where multiple worker agents solve problems supported by RAG, critique each other's solutions, refine their responses, and orchestrator synthesizes a final answer.
 
-2. **Debate System**: A structured debate format where two agents (Proponent and Opponent) argue for and against a given topic, each backed by separate knowledge bases through RAG.
+2. **Debate System**: A structured debate format where two agents (Proponent and Opponent) argue for and against a given topic, each supported by separate knowledge bases through RAG.
 
-Both systems leverage LangGraph for workflow orchestration and use FAISS-based vector search for knowledge retrieval.
-
-## 🏗️ Architecture
+Both systems use LangGraph for workflow orchestration and FAISS for vector search and indexing.
+## Architecture
 
 ### Core Components
 
@@ -28,7 +27,7 @@ auto_debate_ai/
 │       │   ├── faiss_utils.py       # FAISS vector index operations
 │       │   └── process_file.py      # File processing pipeline
 │       └── web_crawl/
-│           └── tavilly_utils.py     # Web search utilities
+│           └── tavilly_utils.py     # Web search utilities (currently not in use because of poor websearch results)
 ├── data/
 │   ├── knowledge_base_1/            # Documents for Proponent/General KB
 │   └── knowledge_base_2/            # Documents for Opponent/Alternate KB
@@ -43,9 +42,9 @@ auto_debate_ai/
 ```
 Problem Input
     ↓
-[Initial Solve] (Worker 1 & Worker 2)
+[Initial Solve] ( by both Worker 1 & Worker 2)
     ↓
-[Critique Peer] (Cross-critique)
+[Critique Peer] (Cross-critique of previous response)
     ↓
 [Refine Response] (Based on critiques)
     ↓
@@ -69,51 +68,44 @@ Topic + RAG Context
 [Generate Summary] (Judge's analysis)
 ```
 
-## 🚀 Features
+## Features
 
 - **Multi-Agent Collaboration**: Worker agents collaborate through iterative critique and refinement
+- **Workflow to ensure quality of output**: The implemented workflow, proves useful to ensure correctness of response in multi-step agentic workflows prone to cascading errors.
 - **Dual Knowledge Bases**: Separate FAISS indexes for different perspectives/knowledge sources
 - **RAG Integration**: Retrieval-Augmented Generation for contextually grounded responses
 - **Structured Debates**: Formal debate rounds with proponent and opponent agents
 - **Web Interface**: Full-featured Streamlit UI for easy interaction
 - **Flexible LLM Backend**: Compatible with OpenAI-style API endpoints (including local models)
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Python 3.8+
-- OpenAI-compatible API endpoint (OpenAI, local LLM servers, etc.)
-- Required API keys (configured in `.env`)
+- OpenAI-compatible API endpoint (We have used a vllm server with openai compatible api use llama-3.1-8B)
+- OpenAI API key
 
-## ⚙️ Installation
+## Installation
 
-1. **Clone the repository**
-```bash
-git clone <repository-url>
-cd auto_debate_ai
-```
+1. **Clone the repository and go to project directory**
 
 2. **Create and activate virtual environment**
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+source .venv/bin/activate
 ```
 
-3. **Install dependencies**
-```bash
-pip install -r requirements.txt
-```
+3. **Install dependencies in requirements.txt**
 
 4. **Configure environment variables**
 
 Create a `.env` file in the project root:
 
 ```env
-OPENAI_API_KEY=your_api_key_here
-OPENAI_API_BASE=https://api.openai.com/v1  # Or your custom endpoint
-TAVILLY_API_KEY=your_tavily_key_here  # Optional, for web search
+OPENAI_API_KEY=empty
+OPENAI_API_BASE=http://0.0.0.0:8000/v1
 ```
 
-## 🎯 Usage
+## Usage
 
 ### Streamlit Web Interface (Recommended)
 
@@ -123,32 +115,11 @@ Launch the interactive web application:
 streamlit run app.py
 ```
 
-The UI provides four main tabs:
+The UI provides three main tabs:
 
-1. **Indexing**: Upload documents (PDF/TXT) to Knowledge Base 1 or 2, process them into FAISS indexes
+1. **Indexing**: Upload documents to Knowledge Base 1 or 2, process document button will process them into FAISS indexes, clear the existing index and metadata, button to delete existing files.
 2. **Orchestrator**: Run collaborative problem-solving with RAG-enhanced context
 3. **Debate**: Start structured debates with separate knowledge bases for each side
-4. **Diagnostics**: View environment status, file counts, and index information
-
-### Command-Line Usage
-
-#### Orchestrator Demo
-
-```bash
-python demo.py
-```
-
-This runs the orchestrator workflow on a predefined problem with RAG context retrieval.
-
-#### Debate Demo
-
-```bash
-python debate.py
-```
-
-This initiates a debate on a predefined topic with configurable rounds.
-
-### Programmatic Usage
 
 #### Orchestrator Example
 
@@ -210,12 +181,11 @@ result = moderator.invoke(initial_state)
 print(result["final_summary"])
 ```
 
-## 📚 Knowledge Base Setup
+## Knowledge Base Setup
 
 ### Adding Documents
 
-1. **Via Streamlit UI**: Use the "Indexing" tab to upload PDF or TXT files
-2. **Manually**: Place files in `data/knowledge_base_1/documents/` or `data/knowledge_base_2/documents/`
+**Via Streamlit UI**: Use the "Indexing" tab to upload PDF or TXT files
 
 ### Processing Documents
 
@@ -243,47 +213,29 @@ clear_index(idx_num=1)  # Clear Knowledge Base 1
 clear_index(idx_num=2)  # Clear Knowledge Base 2
 ```
 
-## 🔧 Configuration
-
 ### Model Configuration
 
 The default model is `meta-llama/Meta-Llama-3.1-8B-Instruct`. To use a different model:
 
-```python
-# In orchestrator_agent.py
-self.llm = ChatOpenAI(
-    model="your-model-name",
-    temperature=0.5,
-    base_url=os.getenv("OPENAI_API_BASE")
-)
-
-# In debate.py
-moderator = DebateModerator(
-    topic=topic,
-    embedding_model=embedding_model,
-    num_rounds=3,
-    model_name="your-model-name"
-)
-```
+For problem solving: The temperature is set to 0.5 by default.
+For debate: The temperature is set to 0.8 for agents and 0.7 for judge.
 
 ### RAG Parameters
 
 - **top_k**: Number of retrieved documents (default: 5)
 - **embedding_model**: SentenceTransformer model (default: 'all-MiniLM-L6-v2')
-- **chunk_size**: Document chunk size (configured in document_chunking.py)
+- **chunk_size**: Document chunk size
 
 ### Orchestrator Parameters
 
-- **max_iterations**: Number of critique-refine cycles (default: 1 in check_loop)
-- **temperature**: LLM temperature for synthesis (default: 0.5)
+- Number of critique-refine cycles (Hard coded to 1 because of compute restrictions)
+- LLM temperature for synthesis (default: 0.5)
 
 ### Debate Parameters
 
 - **num_rounds**: Number of debate rounds (default: 3)
 - **stance**: "for" or "against" for debate agents
-- **temperature**: LLM creativity (default: 0.8 for agents, 0.7 for judge)
-
-## 📊 Data Flow
+- **temperature**: default: 0.8 for agents, 0.7 for judge
 
 ### Document Processing Pipeline
 
@@ -301,7 +253,6 @@ Upload Document (PDF/TXT)
 [Store Metadata] (metadata.json)
 ```
 
-### Query-Time RAG Flow
 
 ```
 User Query
@@ -315,7 +266,7 @@ User Query
 [Return Ranked Results] (score, text, source)
 ```
 
-## 🛠️ Key Dependencies
+## Dependencies
 
 - **langgraph**: Workflow orchestration for multi-agent systems
 - **langchain**: LLM framework and utilities
@@ -324,80 +275,5 @@ User Query
 - **sentence-transformers**: Text embeddings
 - **streamlit**: Web interface
 - **python-dotenv**: Environment configuration
-- **tavily-python**: Web search integration (optional)
+- **tavily-python**: Web search integration (Currently not in use because of poor search results)
 
-## 🔍 How It Works
-
-### Orchestrator System
-
-1. **Initial Solve**: Two worker agents independently solve the problem
-2. **Cross-Critique**: Each worker critiques the other's solution
-3. **Refinement**: Workers refine their solutions based on received critiques
-4. **Iteration**: Process repeats for configured iterations
-5. **Synthesis**: Orchestrator synthesizes final answer from refined responses
-
-### Debate System
-
-1. **Setup**: Topic is set, RAG retrieves relevant context from separate KBs
-2. **Rounds**: Proponent and Opponent alternate arguments for N rounds
-3. **Context**: Each agent uses their designated knowledge base (KB1 or KB2)
-4. **History**: All arguments are tracked in debate_history
-5. **Judgment**: Judge LLM provides final analysis and summary
-
-### RAG Integration
-
-- Documents are chunked and embedded using SentenceTransformers
-- FAISS provides efficient similarity search
-- Query embeddings find most relevant document chunks
-- Retrieved context augments agent prompts
-- Separate indexes enable perspective-based knowledge separation
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**Import Errors**
-```bash
-# Make sure you're in the project root
-cd auto_debate_ai
-python -m streamlit run app.py
-```
-
-**Missing API Keys**
-- Check `.env` file exists and contains valid keys
-- Verify `OPENAI_API_BASE` points to correct endpoint
-
-**Empty RAG Results**
-- Ensure documents are uploaded to correct KB directory
-- Process documents using "Process KB" buttons in UI
-- Check index files exist in `data/knowledge_base_*/embeddings/`
-
-**LLM Connection Errors**
-- Verify API endpoint is accessible
-- Check API key validity
-- Confirm model name matches available models at endpoint
-
-## 📝 License
-
-[Specify your license here]
-
-## 👥 Contributing
-
-[Add contribution guidelines if applicable]
-
-## 🙏 Acknowledgments
-
-Built with:
-- LangGraph for multi-agent orchestration
-- LangChain for LLM integration
-- FAISS for efficient vector search
-- Streamlit for interactive UI
-- SentenceTransformers for embeddings
-
-## 📧 Contact
-
-[Your contact information]
-
----
-
-**Note**: This project demonstrates advanced multi-agent AI patterns including collaborative problem-solving, structured debates, and knowledge-grounded reasoning through RAG. It's designed for research, education, and experimentation with multi-agent systems.
