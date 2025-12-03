@@ -40,9 +40,9 @@ auto_debate_ai/
 
 #### Orchestrator Workflow
 
-[Initial response](/workflow_images/orchestrator_part_one.jpg)
-[Peer critique](/workflow_images/orchestrator_part_two.jpg)
-[Refine response](/workflow_images/orchestrator_part_three.jpg)
+![Initial response](/workflow_images/orchestrator_part_one.jpg)
+![Peer critique](/workflow_images/orchestrator_part_two.jpg)
+![Refine response](/workflow_images/orchestrator_part_three.jpg)
 
 #### Debate Workflow
 ```
