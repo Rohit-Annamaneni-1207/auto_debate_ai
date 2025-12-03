@@ -39,19 +39,10 @@ auto_debate_ai/
 ### Agent Workflows
 
 #### Orchestrator Workflow
-```
-Problem Input
-    ↓
-[Initial Solve] ( by both Worker 1 & Worker 2)
-    ↓
-[Critique Peer] (Cross-critique of previous response)
-    ↓
-[Refine Response] (Based on critiques)
-    ↓
-[Check Loop] (Iterate or continue)
-    ↓
-[Synthesize] (Final answer)
-```
+
+[Initial response](/workflow_images/orchestrator_part_one.jpg)
+[Peer critique](/workflow_images/orchestrator_part_two.jpg)
+[Refine response](/workflow_images/orchestrator_part_three.jpg)
 
 #### Debate Workflow
 ```
@@ -268,12 +259,14 @@ User Query
 
 ## Dependencies
 
-- **langgraph**: Workflow orchestration for multi-agent systems
-- **langchain**: LLM framework and utilities
+- **langgraph**: Agent orchestration
+- **langchain**: LLM utilities
 - **langchain-openai**: OpenAI integration
-- **faiss-cpu**: Vector similarity search
-- **sentence-transformers**: Text embeddings
+- **langchain-community**: pypdf
+- **langchain-text-splitters**: RecursiveCharacterTextSplitter
+- **faiss**: Vector similarity search
+- **sentence-transformers**: Text embedding model
 - **streamlit**: Web interface
-- **python-dotenv**: Environment configuration
+- **python-dotenv**: Set environment vars
 - **tavily-python**: Web search integration (Currently not in use because of poor search results)
 
