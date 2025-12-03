@@ -50,21 +50,6 @@ Peer critique
 Refine response and loop decision
 ![Refine response](/workflow_images/orchestrator_part_three.jpg)
 
-#### Debate Workflow
-```
-Topic + RAG Context
-    ↓
-[Proponent Arguments] (KB1)
-    ↓
-[Opponent Arguments] (KB2)
-    ↓
-[Increment Round]
-    ↓
-[Check Continue]
-    ↓
-[Generate Summary] (Judge's analysis)
-```
-
 ## Features
 
 - **Multi-Agent Collaboration**: Worker agents collaborate through iterative critique and refinement
